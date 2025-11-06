@@ -107,5 +107,22 @@ function EdgeRestore {
     Write-Host "Revert complete."
 }
 
-# Show help if no arguments provided
-if ($args.Count -eq 0) { Show-Help }
+# Handle script invocation logic
+if ($args.Count -eq 0) {
+    EdgeClean
+} elseif ($args[0] -in @("/?", "/help", "help")) {
+    Show-Help
+} elseif ($args[0] -eq "EdgeRestore") {
+    EdgeRestore
+} elseif ($args[0] -eq "EdgeClean") {
+    if ($args.Count -gt 1) {
+        # Use splatting to properly pass remaining arguments
+        $remainingArgs = $args[1..($args.Count-1)]
+        EdgeClean @remainingArgs
+    } else {
+        EdgeClean
+    }
+} else {
+    Write-Host "Invalid command: $($args[0])`n"
+    Show-Help
+}
