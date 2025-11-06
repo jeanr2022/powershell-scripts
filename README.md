@@ -2,11 +2,20 @@
 
 A collection of PowerShell scripts for system administration and WebView2 troubleshooting.
 
-## Available Scripts
+---
 
-- **`src/Get-SystemInfo.ps1`** - Comprehensive system information gathering with export options (Console, JSON, CSV)
-- **`src/EdgeClean.ps1`** - Launch Microsoft Edge in clean state for testing and restore original settings
-- **`src/Get-WebView2Processes.ps1`** - List WebView2 processes with memory usage and export options (Console, CSV, HTML)
+## Available Scripts (in `src/` folder)
+
+### **Get-SystemInfo.ps1**
+Comprehensive system information gathering with export options (Console, JSON, CSV)
+
+### **EdgeClean.ps1**
+Launch Microsoft Edge in clean state for testing and restore original settings
+
+### **Get-WebView2Processes.ps1**
+List WebView2 processes with memory usage and export options (Console, CSV, HTML)
+
+---
 
 ## Prerequisites
 
