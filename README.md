@@ -25,15 +25,22 @@ For production or enterprise use, thoroughly test these scripts in your specific
 
 ### **Get-SystemInfo.ps1**
 Comprehensive system information gathering with export options (Console, JSON, CSV)
+- Read-only: Does not modify system settings
 
-### **EdgeClean.ps1**
+### **EdgeClean.ps1** ⚠️ MODIFIES SYSTEM
 Launch Microsoft Edge in clean state for testing and restore original settings
+- Modifies Windows registry (Edge policies)
+- Creates and removes temporary profile folders
+- Changes can be reverted using EdgeRestore function
 
 ### **Get-WebView2Processes.ps1**
 List WebView2 processes with memory usage and export options (Console, CSV, HTML)
+- Read-only: Does not modify system settings
 
-### **Check-EdgeUpdaterTasks.ps1**
+### **Check-EdgeUpdaterTasks.ps1** ⚠️ MODIFIES SYSTEM
 Check Microsoft Edge updater scheduled tasks and optionally re-enable them if disabled
+- Can enable/disable Windows scheduled tasks (with user confirmation or -AutoEnable flag)
+- Requires Administrator privileges to make changes
 
 ---
 
