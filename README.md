@@ -2,6 +2,23 @@
 
 A collection of PowerShell scripts for system administration and WebView2 troubleshooting.
 
+## Disclaimer
+
+**IMPORTANT: Please read before using these scripts**
+
+These PowerShell scripts have been created for specific troubleshooting and diagnostic purposes. While they have been developed following PowerShell best practices, please note:
+
+- These scripts are provided "AS IS" without warranty of any kind, express or implied
+- They have been tested in limited scenarios and may not cover all edge cases or system configurations
+- Use these scripts at your own risk
+- It is recommended to test scripts in a non-production environment first
+- Always review the script code before execution to understand what changes will be made to your system
+- Some scripts modify system settings (registry, scheduled tasks, etc.) - ensure you understand the impact
+- Back up important data and configurations before running scripts that make system changes
+- The authors and contributors are not liable for any damages or issues arising from the use of these scripts
+
+For production or enterprise use, thoroughly test these scripts in your specific environment and consider adapting them to your organization's standards and requirements.
+
 ---
 
 ## Available Scripts (in `src/` folder)
@@ -25,23 +42,6 @@ Check Microsoft Edge updater scheduled tasks and optionally re-enable them if di
 - Windows PowerShell 5.1 or PowerShell 7+
 - Appropriate execution policy (see troubleshooting section below)
 - Administrator privileges may be required for some scripts
-
-## Disclaimer
-
-**IMPORTANT: Please read before using these scripts**
-
-These PowerShell scripts have been created for specific troubleshooting and diagnostic purposes. While they have been developed following PowerShell best practices, please note:
-
-- These scripts are provided "AS IS" without warranty of any kind, express or implied
-- They have been tested in limited scenarios and may not cover all edge cases or system configurations
-- Use these scripts at your own risk
-- It is recommended to test scripts in a non-production environment first
-- Always review the script code before execution to understand what changes will be made to your system
-- Some scripts modify system settings (registry, scheduled tasks, etc.) - ensure you understand the impact
-- Back up important data and configurations before running scripts that make system changes
-- The authors and contributors are not liable for any damages or issues arising from the use of these scripts
-
-For production or enterprise use, thoroughly test these scripts in your specific environment and consider adapting them to your organization's standards and requirements.
 
 ## Quick Start
 
