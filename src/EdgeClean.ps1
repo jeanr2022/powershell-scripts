@@ -21,13 +21,61 @@
 .PARAMETER PerformanceIsolation
     Disable updates and background networking for cleaner performance testing.
 
+.PARAMETER AcceptDisclaimer
+    Automatically accept the disclaimer without interactive prompt.
+
 .EXAMPLE
     EdgeClean -EnableLogging -PerformanceIsolation
     EdgeRestore
+
+.EXAMPLE
+    EdgeClean -AcceptDisclaimer
+    Run EdgeClean accepting the disclaimer automatically
+
+.NOTES
+    WARNING: This script modifies Windows registry and file system.
+    Use at your own risk. Test in non-production environments first.
 #>
+
+param(
+    [Parameter(Mandatory = $false)]
+    [switch]$AcceptDisclaimer
+)
 
 $EdgeTempProfile = "C:\Temp\EdgeProfile"
 $EdgeExe = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+
+function Show-Disclaimer {
+    Write-Host ""
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host "                              DISCLAIMER" -ForegroundColor Yellow
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "This script will make changes to your system:" -ForegroundColor White
+    Write-Host "  - Modify Windows registry (Edge policies)" -ForegroundColor White
+    Write-Host "  - Create and modify temporary folders" -ForegroundColor White
+    Write-Host "  - Backup existing Edge policy registry keys" -ForegroundColor White
+    Write-Host ""
+    Write-Host "This script is provided 'AS IS' without warranty of any kind." -ForegroundColor White
+    Write-Host "Use at your own risk. Test in non-production environments first." -ForegroundColor White
+    Write-Host ""
+    Write-Host "Changes can be reverted by running: EdgeRestore" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $response = Read-Host "Do you accept and want to continue? (Yes/No)"
+    
+    if ($response -notmatch '^(y|yes)$') {
+        Write-Host ""
+        Write-Host "Script execution cancelled by user." -ForegroundColor Yellow
+        exit 0
+    }
+    
+    Write-Host ""
+    Write-Host "Disclaimer accepted. Proceeding..." -ForegroundColor Green
+    Write-Host ""
+}
 
 function Show-Help {
     Write-Host "`nUsage:"
@@ -109,12 +157,21 @@ function EdgeRestore {
 
 # Handle script invocation logic
 if ($args.Count -eq 0) {
+    # Show disclaimer for EdgeClean (default action)
+    if (-not $AcceptDisclaimer) {
+        Show-Disclaimer
+    }
     EdgeClean
 } elseif ($args[0] -in @("/?", "/help", "help")) {
     Show-Help
 } elseif ($args[0] -eq "EdgeRestore") {
+    # No disclaimer needed for restore operation
     EdgeRestore
 } elseif ($args[0] -eq "EdgeClean") {
+    # Show disclaimer before EdgeClean
+    if (-not $AcceptDisclaimer) {
+        Show-Disclaimer
+    }
     if ($args.Count -gt 1) {
         # Use splatting to properly pass remaining arguments
         $remainingArgs = $args[1..($args.Count-1)]

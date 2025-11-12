@@ -18,6 +18,9 @@
 .PARAMETER CheckOnly
     Only check the status of tasks without offering to enable them.
 
+.PARAMETER AcceptDisclaimer
+    Automatically accept the disclaimer without interactive prompt.
+
 .EXAMPLE
     .\Check-EdgeUpdaterTasks.ps1
     Checks Edge updater tasks and prompts to re-enable any that are disabled.
@@ -30,6 +33,10 @@
     .\Check-EdgeUpdaterTasks.ps1 -CheckOnly
     Only displays the status of Edge updater tasks without prompting to enable.
 
+.EXAMPLE
+    .\Check-EdgeUpdaterTasks.ps1 -AcceptDisclaimer -AutoEnable
+    Automatically re-enables all disabled Edge updater tasks without prompts.
+
 .NOTES
     Author: PowerShell Script Project
     Date: November 2025
@@ -38,6 +45,9 @@
     ADMIN PRIVILEGES:
     - Required to re-enable scheduled tasks
     - Check-only mode works without admin privileges
+    
+    WARNING: This script can modify Windows scheduled tasks.
+    Use at your own risk. Test in non-production environments first.
 #>
 
 [CmdletBinding()]
@@ -46,8 +56,48 @@ param(
     [switch]$AutoEnable,
     
     [Parameter(Mandatory = $false)]
-    [switch]$CheckOnly
+    [switch]$CheckOnly,
+    
+    [Parameter(Mandatory = $false)]
+    [switch]$AcceptDisclaimer
 )
+
+# Function to show disclaimer
+function Show-Disclaimer {
+    Write-Host ""
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host "                              DISCLAIMER" -ForegroundColor Yellow
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "This script can make changes to your system:" -ForegroundColor White
+    Write-Host "  - Enable/disable Windows scheduled tasks" -ForegroundColor White
+    Write-Host "  - Requires Administrator privileges to make changes" -ForegroundColor White
+    Write-Host ""
+    Write-Host "This script is provided 'AS IS' without warranty of any kind." -ForegroundColor White
+    Write-Host "Use at your own risk. Test in non-production environments first." -ForegroundColor White
+    Write-Host ""
+    Write-Host "Note: Check-only mode (-CheckOnly) does not modify the system." -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "=================================================================================" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $response = Read-Host "Do you accept and want to continue? (Yes/No)"
+    
+    if ($response -notmatch '^(y|yes)$') {
+        Write-Host ""
+        Write-Host "Script execution cancelled by user." -ForegroundColor Yellow
+        exit 0
+    }
+    
+    Write-Host ""
+    Write-Host "Disclaimer accepted. Proceeding..." -ForegroundColor Green
+    Write-Host ""
+}
+
+# Show disclaimer unless bypassed or in check-only mode
+if (-not $AcceptDisclaimer -and -not $CheckOnly) {
+    Show-Disclaimer
+}
 
 # Function to check if running as administrator
 function Test-Administrator {
