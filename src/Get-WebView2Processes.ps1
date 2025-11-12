@@ -220,125 +220,53 @@ if ($ExportToHtml) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebView2 Processes Report</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .header {
-            background-color: #0078d4;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .header p {
-            margin: 5px 0 0 0;
-            opacity: 0.9;
-        }
-        .summary {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        th {
-            background-color: #0078d4;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e1e1e1;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #e3f2fd;
-        }
-        .process-id {
-            font-weight: bold;
-            color: #0078d4;
-        }
-        .host-process {
-            font-weight: 600;
-            color: #107c10;
-        }
-        .memory {
-            text-align: center;
-            font-weight: 600;
-        }
-        .path {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-            color: #666;
-            word-break: break-all;
-        }
-        .params {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-            background-color: #f0f0f0;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .version {
-            font-weight: 600;
-            color: #16537e;
-        }
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            color: #666;
-            font-size: 12px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebView2 Processes Report</title>
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f5f5f5; }
+.header { background-color: #0078d4; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+.header h1 { margin: 0; font-size: 24px; }
+.header p { margin: 5px 0 0 0; opacity: 0.9; }
+.summary { background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+table { width: 100%; border-collapse: collapse; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+th { background-color: #0078d4; color: white; padding: 12px; text-align: left; font-weight: 600; }
+td { padding: 12px; border-bottom: 1px solid #e1e1e1; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+tr:hover { background-color: #e3f2fd; }
+.process-id { font-weight: bold; color: #0078d4; }
+.host-process { font-weight: 600; color: #107c10; }
+.memory { text-align: center; font-weight: 600; }
+.path { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: #666; word-break: break-all; }
+.params { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; background-color: #f0f0f0; padding: 4px 8px; border-radius: 4px; }
+.version { font-weight: 600; color: #16537e; }
+.footer { margin-top: 20px; text-align: center; color: #666; font-size: 12px; }
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>WebView2 Processes Report</h1>
-        <p>Generated on $(Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Total Processes: $($processData.Count)</p>
-    </div>
-    
-    <div class="summary">
-        <h3>Summary</h3>
-        <p><strong>Total WebView2 Processes:</strong> $($processData.Count)</p>
-        <p><strong>Total Memory Usage:</strong> $([Math]::Round(($processData | Measure-Object -Property MemoryMB -Sum).Sum, 2)) MB</p>
-        <p><strong>Unique Versions:</strong> $(($processData | Select-Object -Property FileVersion -Unique | Where-Object { $_.FileVersion -ne "[Version not accessible]" }).Count)</p>
-    </div>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Process ID</th>
-                <th>Host Process</th>
-                <th>Memory (MB)</th>
-                <th>Version</th>
-                <th>Start Time</th>
-                <th>Executable Path</th>
-                <th>Parameters</th>
-            </tr>
-        </thead>
-        <tbody>
+<div class="header">
+<h1>WebView2 Processes Report</h1>
+<p>Generated on $(Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Total Processes: $($processData.Count)</p>
+</div>
+<div class="summary">
+<h3>Summary</h3>
+<p><strong>Total WebView2 Processes:</strong> $($processData.Count)</p>
+<p><strong>Total Memory Usage:</strong> $([Math]::Round(($processData | Measure-Object -Property MemoryMB -Sum).Sum, 2)) MB</p>
+<p><strong>Unique Versions:</strong> $(($processData | Select-Object -Property FileVersion -Unique | Where-Object { $_.FileVersion -ne "[Version not accessible]" }).Count)</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Process ID</th>
+<th>Host Process</th>
+<th>Memory (MB)</th>
+<th>Version</th>
+<th>Start Time</th>
+<th>Executable Path</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody>
 "@
 
         # Function to encode HTML special characters
@@ -350,27 +278,14 @@ if ($ExportToHtml) {
 
         # Add table rows
         foreach ($proc in $processData) {
-            $htmlContent += @"
-            <tr>
-                <td class="process-id">$($proc.ProcessId)</td>
-                <td class="host-process">$(ConvertTo-HtmlEncoded $proc.HostProcess)</td>
-                <td class="memory">$($proc.MemoryMB)</td>
-                <td class="version">$(ConvertTo-HtmlEncoded $proc.FileVersion)</td>
-                <td>$($proc.StartTime)</td>
-                <td class="path">$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td>
-                <td class="params">$(ConvertTo-HtmlEncoded $proc.Parameters)</td>
-            </tr>
-"@
+            $htmlContent += "<tr><td class='process-id'>$($proc.ProcessId)</td><td class='host-process'>$(ConvertTo-HtmlEncoded $proc.HostProcess)</td><td class='memory'>$($proc.MemoryMB)</td><td class='version'>$(ConvertTo-HtmlEncoded $proc.FileVersion)</td><td>$($proc.StartTime)</td><td class='path'>$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td><td class='params'>$(ConvertTo-HtmlEncoded $proc.Parameters)</td></tr>`n"
         }
 
         # Close HTML
         $htmlContent += @"
-        </tbody>
-    </table>
-    
-    <div class="footer">
-        <p>Report generated by Get-WebView2Processes.ps1</p>
-    </div>
+</tbody>
+</table>
+<div class="footer"><p>Report generated by Get-WebView2Processes.ps1</p></div>
 </body>
 </html>
 "@
