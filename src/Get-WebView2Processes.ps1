@@ -136,14 +136,25 @@ foreach ($proc in $sortedProcesses) {
         
         # Clean up the parameters (remove extra spaces and format consistently)
         $cmdParams = $cmdParams -replace '--webview-exe-name[=\s]+', '--webview-exe-name=' -replace '--type[=\s]+', '--type='
+        
+        # Extract host process name from --webview-exe-name parameter
+        if ($cmdLine -match '--webview-exe-name[=\s]+([^\s]+)') {
+            $hostProcess = $matches[1]
+            # Remove path if present and keep only the executable name
+            $hostProcess = Split-Path -Leaf $hostProcess
+        } else {
+            $hostProcess = "[Not specified]"
+        }
     } else {
         $cmdParams = "[Command line not accessible]"
+        $hostProcess = "[Not accessible]"
     }
 
     # Create process data object for potential CSV export
     $processInfo = [PSCustomObject]@{
         ProcessId = $proc.Id
         ProcessName = $proc.ProcessName
+        HostProcess = $hostProcess
         MemoryMB = $sizeMB
         FileVersion = $fileVersion
         ExecutablePath = $exePath
@@ -154,7 +165,7 @@ foreach ($proc in $sortedProcesses) {
 
     if (-not $ExportToCsv -and -not $ExportToHtml) {
         # Display process information with enhanced details (console output)
-        Write-Host ("PID: {0} | Size: {1} MB | Version: {2}" -f $proc.Id, $sizeMB, $fileVersion) -ForegroundColor Cyan
+        Write-Host ("PID: {0} | Host: {1} | Size: {2} MB | Version: {3}" -f $proc.Id, $hostProcess, $sizeMB, $fileVersion) -ForegroundColor Cyan
         Write-Host ("  Path: {0}" -f $exePath) -ForegroundColor Gray
         Write-Host ("  Params: {0}" -f $cmdParams) -ForegroundColor White
         Write-Host "" # Empty line for better readability
@@ -178,7 +189,7 @@ if ($ExportToCsv) {
         # Show first few entries as preview
         if ($processData.Count -gt 0) {
             Write-Host "`nPreview of exported data:" -ForegroundColor Yellow
-            $processData | Select-Object ProcessId, MemoryMB, FileVersion | Format-Table -AutoSize
+            $processData | Select-Object ProcessId, HostProcess, MemoryMB, FileVersion | Format-Table -AutoSize
         }
     }
     catch {
@@ -269,8 +280,12 @@ if ($ExportToHtml) {
             font-weight: bold;
             color: #0078d4;
         }
+        .host-process {
+            font-weight: 600;
+            color: #107c10;
+        }
         .memory {
-            text-align: right;
+            text-align: center;
             font-weight: 600;
         }
         .path {
@@ -315,6 +330,7 @@ if ($ExportToHtml) {
         <thead>
             <tr>
                 <th>Process ID</th>
+                <th>Host Process</th>
                 <th>Memory (MB)</th>
                 <th>Version</th>
                 <th>Start Time</th>
@@ -337,6 +353,7 @@ if ($ExportToHtml) {
             $htmlContent += @"
             <tr>
                 <td class="process-id">$($proc.ProcessId)</td>
+                <td class="host-process">$(ConvertTo-HtmlEncoded $proc.HostProcess)</td>
                 <td class="memory">$($proc.MemoryMB)</td>
                 <td class="version">$(ConvertTo-HtmlEncoded $proc.FileVersion)</td>
                 <td>$($proc.StartTime)</td>
