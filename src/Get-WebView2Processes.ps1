@@ -156,10 +156,10 @@ foreach ($proc in $sortedProcesses) {
     $processInfo = [PSCustomObject]@{
         ProcessId = $proc.Id
         HostProcess = $hostProcess
-        Type = $processType
         MemoryMB = $sizeMB
         FileVersion = $fileVersion
         ExecutablePath = $exePath
+        Type = $processType
         StartTime = if ($proc.StartTime) { $proc.StartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { "Unknown" }
     }
     $processData += $processInfo
@@ -189,7 +189,7 @@ if ($ExportToCsv) {
         # Show first few entries as preview
         if ($processData.Count -gt 0) {
             Write-Host "`nPreview of exported data:" -ForegroundColor Yellow
-            $processData | Select-Object ProcessId, HostProcess, Type, MemoryMB, FileVersion | Format-Table -AutoSize
+            $processData | Select-Object ProcessId, HostProcess, MemoryMB, FileVersion, Type | Format-Table -AutoSize
         }
     }
     catch {
@@ -258,11 +258,11 @@ tr:hover { background-color: #e3f2fd; }
 <tr>
 <th>Process ID</th>
 <th>Host Process</th>
-<th>Type</th>
 <th>Memory (MB)</th>
 <th>Version</th>
 <th>Start Time</th>
 <th>Executable Path</th>
+<th>Type</th>
 </tr>
 </thead>
 <tbody>
@@ -277,7 +277,7 @@ tr:hover { background-color: #e3f2fd; }
 
         # Add table rows
         foreach ($proc in $processData) {
-            $htmlContent += "<tr><td class='process-id'>$($proc.ProcessId)</td><td class='host-process'>$(ConvertTo-HtmlEncoded $proc.HostProcess)</td><td class='params'>$(ConvertTo-HtmlEncoded $proc.Type)</td><td class='memory'>$($proc.MemoryMB)</td><td class='version'>$(ConvertTo-HtmlEncoded $proc.FileVersion)</td><td>$($proc.StartTime)</td><td class='path'>$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td></tr>`n"
+            $htmlContent += "<tr><td class='process-id'>$($proc.ProcessId)</td><td class='host-process'>$(ConvertTo-HtmlEncoded $proc.HostProcess)</td><td class='memory'>$($proc.MemoryMB)</td><td class='version'>$(ConvertTo-HtmlEncoded $proc.FileVersion)</td><td>$($proc.StartTime)</td><td class='path'>$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td><td class='params'>$(ConvertTo-HtmlEncoded $proc.Type)</td></tr>`n"
         }
 
         # Close HTML
