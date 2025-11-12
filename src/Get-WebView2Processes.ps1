@@ -181,8 +181,8 @@ if ($ExportToCsv) {
     }
     
     try {
-        # Export to CSV
-        $processData | Export-Csv -Path $CsvPath -NoTypeInformation -Encoding UTF8
+        # Export to CSV with UTF8-BOM encoding for better Excel compatibility
+        $processData | Export-Csv -Path $CsvPath -NoTypeInformation -Encoding UTF8 -Delimiter "," -UseCulture
         Write-Host "WebView2 process data exported successfully to: $CsvPath" -ForegroundColor Green
         Write-Host "Total processes exported: $($processData.Count)" -ForegroundColor Green
         
