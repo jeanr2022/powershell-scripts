@@ -15,13 +15,33 @@ Launch Microsoft Edge in clean state for testing and restore original settings
 ### **Get-WebView2Processes.ps1**
 List WebView2 processes with memory usage and export options (Console, CSV, HTML)
 
+### **Check-EdgeUpdaterTasks.ps1**
+Check Microsoft Edge updater scheduled tasks and optionally re-enable them if disabled
+
 ---
 
 ## Prerequisites
 
-- **Windows PowerShell 5.1** or **PowerShell 7+**
-- **Appropriate execution policy** (see troubleshooting section below)
-- **Administrator privileges** may be required for some scripts
+- Windows PowerShell 5.1 or PowerShell 7+
+- Appropriate execution policy (see troubleshooting section below)
+- Administrator privileges may be required for some scripts
+
+## Disclaimer
+
+**IMPORTANT: Please read before using these scripts**
+
+These PowerShell scripts have been created for specific troubleshooting and diagnostic purposes. While they have been developed following PowerShell best practices, please note:
+
+- These scripts are provided "AS IS" without warranty of any kind, express or implied
+- They have been tested in limited scenarios and may not cover all edge cases or system configurations
+- Use these scripts at your own risk
+- It is recommended to test scripts in a non-production environment first
+- Always review the script code before execution to understand what changes will be made to your system
+- Some scripts modify system settings (registry, scheduled tasks, etc.) - ensure you understand the impact
+- Back up important data and configurations before running scripts that make system changes
+- The authors and contributors are not liable for any damages or issues arising from the use of these scripts
+
+For production or enterprise use, thoroughly test these scripts in your specific environment and consider adapting them to your organization's standards and requirements.
 
 ## Quick Start
 
@@ -120,6 +140,18 @@ powershell -ExecutionPolicy Bypass -File ".\src\YourScript.ps1"
 .\src\EdgeClean.ps1 EdgeRestore
 ```
 
+### Edge Updater Task Checker
+```powershell
+# Check Edge updater tasks and prompt to enable if disabled
+.\src\Check-EdgeUpdaterTasks.ps1
+
+# Check only mode (no changes)
+.\src\Check-EdgeUpdaterTasks.ps1 -CheckOnly
+
+# Auto-enable all disabled tasks (requires admin)
+.\src\Check-EdgeUpdaterTasks.ps1 -AutoEnable
+```
+
 ## Development
 
 ### Project Structure
@@ -128,7 +160,8 @@ powershell -ExecutionPolicy Bypass -File ".\src\YourScript.ps1"
 ├── src/                     # PowerShell scripts
 │   ├── Get-SystemInfo.ps1
 │   ├── EdgeClean.ps1
-│   └── Get-WebView2Processes.ps1
+│   ├── Get-WebView2Processes.ps1
+│   └── Check-EdgeUpdaterTasks.ps1
 ├── tests/                   # Test scripts (Pester tests)
 ├── docs/                    # Documentation
 ├── .gitignore              # Git ignore file
@@ -172,3 +205,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - WebView2 Troubleshooting: Debug WebView2 applications and processes  
 - Development Testing: Clean browser environments for testing
 - Reporting: Generate HTML/CSV reports for process monitoring
+- Update Management: Ensure Edge updater tasks are enabled for security updates
