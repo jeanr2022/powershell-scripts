@@ -132,11 +132,6 @@ foreach ($proc in $sortedProcesses) {
     
     # Extract only --webview-exe-name and --type from CommandLine
     if ($cmdLine) {
-        $cmdParams = ($cmdLine | Select-String -Pattern '--webview-exe-name[=\s]+[^\s]+|--type[=\s]+[^\s]+' -AllMatches).Matches.Value -join ' '
-        
-        # Clean up the parameters (remove extra spaces and format consistently)
-        $cmdParams = $cmdParams -replace '--webview-exe-name[=\s]+', '--webview-exe-name=' -replace '--type[=\s]+', '--type='
-        
         # Extract host process name from --webview-exe-name parameter
         if ($cmdLine -match '--webview-exe-name[=\s]+([^\s]+)') {
             $hostProcess = $matches[1]
@@ -145,29 +140,34 @@ foreach ($proc in $sortedProcesses) {
         } else {
             $hostProcess = "[Not specified]"
         }
+        
+        # Extract only the type value from --type parameter
+        if ($cmdLine -match '--type[=\s]+([^\s]+)') {
+            $processType = $matches[1]
+        } else {
+            $processType = ""
+        }
     } else {
-        $cmdParams = "[Command line not accessible]"
         $hostProcess = "[Not accessible]"
+        $processType = "[Not accessible]"
     }
 
     # Create process data object for potential CSV export
     $processInfo = [PSCustomObject]@{
         ProcessId = $proc.Id
-        ProcessName = $proc.ProcessName
         HostProcess = $hostProcess
+        Type = $processType
         MemoryMB = $sizeMB
         FileVersion = $fileVersion
         ExecutablePath = $exePath
-        Parameters = $cmdParams
         StartTime = if ($proc.StartTime) { $proc.StartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { "Unknown" }
     }
     $processData += $processInfo
 
     if (-not $ExportToCsv -and -not $ExportToHtml) {
         # Display process information with enhanced details (console output)
-        Write-Host ("PID: {0} | Host: {1} | Size: {2} MB | Version: {3}" -f $proc.Id, $hostProcess, $sizeMB, $fileVersion) -ForegroundColor Cyan
+        Write-Host ("PID: {0} | Host: {1} | Type: {2} | Size: {3} MB | Version: {4}" -f $proc.Id, $hostProcess, $processType, $sizeMB, $fileVersion) -ForegroundColor Cyan
         Write-Host ("  Path: {0}" -f $exePath) -ForegroundColor Gray
-        Write-Host ("  Params: {0}" -f $cmdParams) -ForegroundColor White
         Write-Host "" # Empty line for better readability
     }
 }
@@ -181,15 +181,15 @@ if ($ExportToCsv) {
     }
     
     try {
-        # Export to CSV with UTF8-BOM encoding for better Excel compatibility
-        $processData | Export-Csv -Path $CsvPath -NoTypeInformation -Encoding UTF8 -Delimiter "," -UseCulture
+        # Export to CSV with culture-appropriate delimiter for Excel compatibility
+        $processData | Export-Csv -Path $CsvPath -NoTypeInformation -UseCulture
         Write-Host "WebView2 process data exported successfully to: $CsvPath" -ForegroundColor Green
         Write-Host "Total processes exported: $($processData.Count)" -ForegroundColor Green
         
         # Show first few entries as preview
         if ($processData.Count -gt 0) {
             Write-Host "`nPreview of exported data:" -ForegroundColor Yellow
-            $processData | Select-Object ProcessId, HostProcess, MemoryMB, FileVersion | Format-Table -AutoSize
+            $processData | Select-Object ProcessId, HostProcess, Type, MemoryMB, FileVersion | Format-Table -AutoSize
         }
     }
     catch {
@@ -198,9 +198,8 @@ if ($ExportToCsv) {
         
         # Display on console as fallback
         foreach ($proc in $processData) {
-            Write-Host ("PID: {0} | Size: {1} MB | Version: {2}" -f $proc.ProcessId, $proc.MemoryMB, $proc.FileVersion) -ForegroundColor Cyan
+            Write-Host ("PID: {0} | Host: {1} | Type: {2} | Size: {3} MB | Version: {4}" -f $proc.ProcessId, $proc.HostProcess, $proc.Type, $proc.MemoryMB, $proc.FileVersion) -ForegroundColor Cyan
             Write-Host ("  Path: {0}" -f $proc.ExecutablePath) -ForegroundColor Gray
-            Write-Host ("  Params: {0}" -f $proc.Parameters) -ForegroundColor White
             Write-Host ""
         }
     }
@@ -259,11 +258,11 @@ tr:hover { background-color: #e3f2fd; }
 <tr>
 <th>Process ID</th>
 <th>Host Process</th>
+<th>Type</th>
 <th>Memory (MB)</th>
 <th>Version</th>
 <th>Start Time</th>
 <th>Executable Path</th>
-<th>Parameters</th>
 </tr>
 </thead>
 <tbody>
@@ -278,7 +277,7 @@ tr:hover { background-color: #e3f2fd; }
 
         # Add table rows
         foreach ($proc in $processData) {
-            $htmlContent += "<tr><td class='process-id'>$($proc.ProcessId)</td><td class='host-process'>$(ConvertTo-HtmlEncoded $proc.HostProcess)</td><td class='memory'>$($proc.MemoryMB)</td><td class='version'>$(ConvertTo-HtmlEncoded $proc.FileVersion)</td><td>$($proc.StartTime)</td><td class='path'>$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td><td class='params'>$(ConvertTo-HtmlEncoded $proc.Parameters)</td></tr>`n"
+            $htmlContent += "<tr><td class='process-id'>$($proc.ProcessId)</td><td class='host-process'>$(ConvertTo-HtmlEncoded $proc.HostProcess)</td><td class='params'>$(ConvertTo-HtmlEncoded $proc.Type)</td><td class='memory'>$($proc.MemoryMB)</td><td class='version'>$(ConvertTo-HtmlEncoded $proc.FileVersion)</td><td>$($proc.StartTime)</td><td class='path'>$(ConvertTo-HtmlEncoded $proc.ExecutablePath)</td></tr>`n"
         }
 
         # Close HTML
@@ -304,9 +303,8 @@ tr:hover { background-color: #e3f2fd; }
         
         # Display on console as fallback
         foreach ($proc in $processData) {
-            Write-Host ("PID: {0} | Size: {1} MB | Version: {2}" -f $proc.ProcessId, $proc.MemoryMB, $proc.FileVersion) -ForegroundColor Cyan
+            Write-Host ("PID: {0} | Host: {1} | Type: {2} | Size: {3} MB | Version: {4}" -f $proc.ProcessId, $proc.HostProcess, $proc.Type, $proc.MemoryMB, $proc.FileVersion) -ForegroundColor Cyan
             Write-Host ("  Path: {0}" -f $proc.ExecutablePath) -ForegroundColor Gray
-            Write-Host ("  Params: {0}" -f $proc.Parameters) -ForegroundColor White
             Write-Host ""
         }
     }
